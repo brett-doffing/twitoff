@@ -3,6 +3,7 @@
 from flask import Flask, render_template
 from .models import DB, User, insert_example_users
 
+
 def create_app():
     app = Flask(__name__)
 
@@ -16,14 +17,14 @@ def create_app():
         # Drop for the sake of dropping
         DB.drop_all()
 
-        # `checkfirst` argument defaults to True, and will therefore 
+        # `checkfirst` argument defaults to True, and will therefore
         # not create a table if it already exists.
-        DB.create_all() 
+        DB.create_all()
 
         insert_example_users()
-        
+
         return render_template('base.html', title='Home',
-                                users=User.query.all())
+                               users=User.query.all())
 
     @app.route('/goodbye')
     def goodbye():
