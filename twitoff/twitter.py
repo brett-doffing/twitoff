@@ -12,7 +12,7 @@ TWITTER_AUTH = tweepy.OAuthHandler(TWITTER_API_KEY, TWITTER_API_KEY_SECRET)
 
 TWITTER = tweepy.API(TWITTER_AUTH)
 
-# nlp = spacy.load('my_model') TODO
+nlp = spacy.load('my_model')
 
 def vectorize_tweet(tweet_text):
     return nlp(tweet_text).embeddings
