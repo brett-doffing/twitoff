@@ -5,8 +5,8 @@ import spacy
 from .models import DB, Tweet, User
 
 
-TWITTER_API_KEY=getenv('TWITTER_API_KEY')
-TWITTER_API_KEY_SECRET=getenv('TWITTER_API_KEY_SECRET')
+TWITTER_API_KEY = getenv('TWITTER_API_KEY')
+TWITTER_API_KEY_SECRET = etenv('TWITTER_API_KEY_SECRET')
 
 TWITTER_AUTH = tweepy.OAuthHandler(TWITTER_API_KEY, TWITTER_API_KEY_SECRET)
 
@@ -14,15 +14,17 @@ TWITTER = tweepy.API(TWITTER_AUTH)
 
 nlp = spacy.load('my_model')
 
+
 def vectorize_tweet(tweet_text):
-    return nlp(tweet_text).embeddings
+    return nlp(tweet_text).vector
+
 
 def update_or_add_user(username):
     try:
         """Create user based on `username`"""
         twitter_user = TWITTER.get_user(username)
 
-        # crazy syntax: 
+        # crazy syntax:
         # If they exist then update that user, if we get something back
         # then instantiate a new user
         db_user = (User.query.get(twitter_user.id)) or User(
@@ -32,9 +34,9 @@ def update_or_add_user(username):
         DB.session.add(db_user)
 
         tweets = twitter_user.timeline(
-            count=200, 
-            exclude_replies=True, 
-            include_rts=False, 
+            count=200,
+            exclude_replies=True,
+            include_rts=False,
             tweet_mode='Extended'
         )  # a list of tweets from `username`
 
@@ -44,7 +46,7 @@ def update_or_add_user(username):
 
         for tweet in tweets:
             # vectorize each tweet
-            vectorized_tweet = vectorize_tweet(tweet.full_text)
+            vectorized_tweet = vectorize_tweet(tweet.text)
             # Create tweet to add to DB
             db_tweet = Tweet(id=tweet.id, text=tweet.text,
                              vect=vectorized_tweet)
@@ -58,5 +60,3 @@ def update_or_add_user(username):
     else:
         # Commit
         DB.session.commit()
-
-

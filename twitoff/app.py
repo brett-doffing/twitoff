@@ -1,9 +1,10 @@
 """"Main app/routing file for Twitoff."""
 
 from os import getenv
-from flask import Flask, render_template
-from .models import DB, User, insert_example_users
+from flask import Flask, render_template, request
+from .models import DB, User
 from .twitter import update_or_add_user
+from .predict import predict_user
 
 
 def create_app():
@@ -16,13 +17,6 @@ def create_app():
 
     @app.route('/')
     def root():
-        # Drop for the sake of dropping
-        # DB.drop_all()
-
-        # `checkfirst` argument defaults to True, and will therefore
-        # not create a table if it already exists.
-        # DB.create_all()
-
         return render_template('base.html', title='Home',
                                users=User.query.all())
 
@@ -32,10 +26,50 @@ def create_app():
         DB.create_all()
         return render_template('base.html', title='Home')
 
-    @app.route('/update')
+    @app.route('/update', methods=["POST"])
     def update():
-        update_or_add_user("elonmusk")
+        update_or_add_user(request.values["user_name"])
         return render_template('base.html', title="Home",
                                users=User.query.all())
+
+    @app.route('/compare', methods=["POST"])
+    def compare():
+        user_0, user_1 = sorted(
+            [request.values["user1"], request.values["user2"]])
+
+        if user_0 == user_1:
+            message = "Cannot compare users to themselves?!"
+        else:
+            prediction = predict_user(
+                user_0,
+                user_1,
+                request.values["tweet_text"]
+            )
+            message = "{} is more likely to be said by {} than {}".format(
+                                        request.values["tweet_text"],
+                                        user_1 if prediction else user_0,
+                                        user_0 if prediction else user_1
+                                    )
+
+        return render_template('prediction.html', title="Prediction",
+                               message=message)
+
+    @app.route("/user", methods=["POST"])
+    @app.route("/user/<name>", methods=["GET"])
+    def user(name=None, message=""):
+        name = name or request.values["user_name"]
+        try:
+            if request.method == "POST":
+                update_or_add_user(name)
+                message = "User {} was successfully added.".format(name)
+
+            tweets = User.query.filter(User.name == name).one().tweets
+
+        except Exception as e:
+            message = "Error adding {}: {}".format(name, e)
+            tweets = []
+
+        return render_template("user.html", title=name,
+                               tweets=tweets, message=message)
 
     return app
