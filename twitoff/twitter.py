@@ -60,8 +60,3 @@ def update_or_add_user(username):
         DB.session.commit()
 
 
-    DB.session.commit()
-
-
-def insert_example_users():
-    update_or_add_user("elonmusk")
