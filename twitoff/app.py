@@ -75,3 +75,7 @@ def create_app():
                                tweets=tweets, message=message)
 
     return app
+
+
+if __name__ == '__main__':
+    create_app()
