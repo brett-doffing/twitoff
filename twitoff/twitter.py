@@ -37,7 +37,8 @@ def update_or_add_user(username):
             count=200,
             exclude_replies=True,
             include_rts=False,
-            tweet_mode='Extended'
+            tweet_mode='Extended',
+            since_id=db_user.newest_tweet_id
         )  # a list of tweets from `username`
 
         # empty tweets = false

@@ -1,6 +1,6 @@
 """Prediction of Users based on Tweet embeddings"""
 from .models import User
-from .twitter import update_or_add_user, vectorize_tweet
+from .twitter import vectorize_tweet
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 
