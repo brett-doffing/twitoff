@@ -1,1 +1,1 @@
-web: gunicorn run:twitoff-doffing81 -t 120
+web:gunicorn twitoff-doffing81:app -t 120
