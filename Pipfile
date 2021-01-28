@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pip = "21.0"
 flask = "*"
 flask-sqlalchemy = "*"
 jinja2 = "*"
